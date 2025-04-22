@@ -2,17 +2,22 @@
 # It will get available seat load thanks to JS (That is not possible with BeatifulSoup)
 # Besides it will be usefull to interact with the website for potential booking automation !
 
-import os
-import time
-import requests
-from dotenv import load_dotenv
-from selenium import webdriver
+
 from selenium.webdriver.chrome.service import Service  # Use to load browser driver
 from selenium.webdriver.common.by import By  # Needed to tell Selenium how to find an element (button..)
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait  # Needed to wait for element to load
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from dotenv import load_dotenv
+from selenium import webdriver
+
+import requests
+import time
+import os
+
+
+
 
 # Load environment variables (like email and password) from the .env file
 load_dotenv()
