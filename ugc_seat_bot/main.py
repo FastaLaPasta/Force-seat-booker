@@ -55,6 +55,7 @@ class UGCBookingBot:
         try:
             button = self.wait.until(EC.element_to_be_clickable((by, value)))
             button.click()
+            time.sleep(1)
         except Exception as e:
             print(f"Error clicking the button with {by} = {value}: {e}")
 
@@ -85,11 +86,12 @@ class UGCBookingBot:
     def login(self):
         # Login to the website
         try:
-            time.sleep(0.5)
+            time.sleep(1)
             username_field = self.wait.until(EC.presence_of_element_located((By.ID, 'mail')))
             username_field.clear()
             username_field.send_keys(EMAIL)
 
+            time.sleep(1)
             password_field = self.wait.until(EC.presence_of_element_located((By.ID, 'password')))
             password_field.clear()
             password_field.send_keys(PASSWORD)
@@ -127,7 +129,6 @@ class UGCBookingBot:
     def monitor_seats(self, check_interval=180):
         try:
             while True:
-                self.driver.refresh()
                 time.sleep(3)  # Let JS reload
 
                 available_seats = self.find_available_seats()
@@ -138,6 +139,7 @@ class UGCBookingBot:
                     print(f'no seat available. retry in {check_interval} seconds...')
 
                 time.sleep(check_interval)
+                self.driver.refresh()
         except KeyboardInterrupt:
             print("Monitoring stopped by user.")
             return available_seats
