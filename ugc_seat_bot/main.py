@@ -184,10 +184,11 @@ class UGCBookingBot:
 
         self.navigate_to_movie(city, cinema)
 
-        # THe movie and schedule selection to do
+        # TODO THe movie and schedule selection to do
         self.click_button(By.ID, 'goToFilm_5828_info_title')
         self.click_button(By.ID, 'goToShowing_330471481717')
 
+        # TODO will come later after user's accounts have been implemented
         self.login()
         self.select_payment_method()
         available_seats = self.monitor_seats()
