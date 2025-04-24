@@ -108,39 +108,32 @@ class UGCBookingBot:
 
     def is_element_in_viewport(self, element):
         """Check if the element is in the visible viewport."""
-        # Get the element's location and size
         location = element.location_once_scrolled_into_view
         size = element.size
-
-        # Get the viewport size
         viewport_height = self.driver.execute_script("return window.innerHeight;")
         viewport_width = self.driver.execute_script("return window.innerWidth;")
 
-        # Check if the element is within the bounds of the viewport
-        is_in_viewport = (
-            location['y'] >= 0 and location['y'] + size['height'] <= viewport_height and
-            location['x'] >= 0 and location['x'] + size['width'] <= viewport_width
-        )
-
-        return is_in_viewport
+        return 0 <= location['y'] < viewport_height and \
+            0 <= location['x'] < viewport_width and \
+            location['y'] + size['height'] <= viewport_height and \
+            location['x'] + size['width'] <= viewport_width
 
     def select_date(self, target_date_input):
         target_id = f"nav_date_{target_date_input}"
 
         try:
-            # Wait until the target date element is present in the DOM
             target_element = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.ID, target_id))
             )
-            # Scroll the element into view (multiple attempts if needed)
-            for _ in range(5):  # Try 5 scrolls
+
+            # Attempt to scroll the element into view
+            for _ in range(5):
                 self.driver.execute_script("arguments[0].scrollIntoView(true);", target_element)
-                time.sleep(0.5)  # Add a small delay for the page to catch up
-                if self.is_element_in_viewport(target_element):  # Check if it's now in the viewport
-                    break
-            # After scrolling, click on the target element
+                time.sleep(0.5)
+                if self.is_element_in_viewport(target_element): break
+
             target_element.click()
-            print(f"🎯 Date {target_date_input} selected successfully.")
+            print(f"🎯 Date {target_date_input} selected.")
         except Exception as e:
             print(f"Error selecting date: {e}")
 
@@ -246,9 +239,7 @@ class UGCBookingBot:
         city = input('city: ')
 
         self.navigate_to_movie(city, cinema)
-
-        # TODO need something to select a specific date
-
+        # TODO Need to handle 2000 or more characters message
         # TODO will come later after user's accounts have been implemented
         self.login()
         self.select_payment_method()
