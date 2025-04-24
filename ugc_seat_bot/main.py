@@ -70,18 +70,48 @@ class UGCBookingBot:
         except Exception as e:
             print(f"No cookies popup shown: {e}")
 
-    def navigate_to_movie(self):
-        # Navigate through website to the movie selection menu
+    def select_city(self, city_input: str):
+        """
+        Select the city from the user's input.
+        """
+        city_input = city_input.strip().lower()
+        for title in self.wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.accordion-title"))):
+            title_text = title.text.strip().lower()
+            if city_input in title_text:
+                title.click()
+                print(f"Clicked on city: {title.text.strip()}")
+                return
+        raise ValueError(f"City '{city_input}' not found.")
+
+    def select_cinema(self, cinema_input: str):
+        """
+        Select the cinema from the user's input.
+        """
+        cinema_input = cinema_input.strip().lower()
+        accordion_contents = self.driver.find_elements(By.CSS_SELECTOR, "div.accordion-content")
+        for content in accordion_contents:
+            for link in content.find_elements(By.TAG_NAME, "a"):
+                link_text = link.text.strip().lower()
+                if cinema_input in link_text:
+                    print(f"Clicked on cinema: {link.text.strip()}")
+                    link.click()
+                    return
+        raise ValueError(f"Cinema '{cinema_input}' not found.")
+
+    def navigate_to_movie(self, city_input: str, cinema_input: str):
+        """
+        Navigates to the desired cinema based on user input.
+        Assumes that the user is on the UGC homepage.
+        """
         try:
+            # Open cinema selection modal
             self.click_button(By.CSS_SELECTOR, "button.pseudo-select[data-target='#modal-search-cinema']")
-            self.click_button(By.CSS_SELECTOR, "a.accordion-title[href='#quickaccess-10']")
-            self.click_button(By.ID, "quickAccessCinema_30")
-            self.click_button(By.ID, 'goToFilm_5828_info_title')
-            self.click_button(By.ID, 'goToShowing_330471481717')
-            print("Movie and schedule selected")
+            self.select_city(city_input)
+            self.select_cinema(cinema_input)
         except Exception as e:
-            print(f"Failed to navigate to movie: {e}")
+            print(f"Navigation error: {e}")
             self.driver.quit()
+        print("Movie and schedule selected")
 
     def login(self):
         # Login to the website
@@ -148,7 +178,16 @@ class UGCBookingBot:
         # Go to the homepage and start the process
         self.driver.get("https://www.ugc.fr")
         self.accept_cookies()
-        self.navigate_to_movie()
+
+        cinema = input('cinema: ')
+        city = input('city: ')
+
+        self.navigate_to_movie(city, cinema)
+
+        # THe movie and schedule selection to do
+        self.click_button(By.ID, 'goToFilm_5828_info_title')
+        self.click_button(By.ID, 'goToShowing_330471481717')
+
         self.login()
         self.select_payment_method()
         available_seats = self.monitor_seats()
