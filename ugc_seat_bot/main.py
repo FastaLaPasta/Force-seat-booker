@@ -17,8 +17,6 @@ import time
 import os
 
 
-
-
 # Load environment variables (like email and password) from the .env file
 load_dotenv()
 
@@ -108,13 +106,43 @@ class UGCBookingBot:
                 return
         raise ValueError(f"Error selecting movie: '{movie_title}' ")
 
+    def is_element_in_viewport(self, element):
+        """Check if the element is in the visible viewport."""
+        # Get the element's location and size
+        location = element.location_once_scrolled_into_view
+        size = element.size
+
+        # Get the viewport size
+        viewport_height = self.driver.execute_script("return window.innerHeight;")
+        viewport_width = self.driver.execute_script("return window.innerWidth;")
+
+        # Check if the element is within the bounds of the viewport
+        is_in_viewport = (
+            location['y'] >= 0 and location['y'] + size['height'] <= viewport_height and
+            location['x'] >= 0 and location['x'] + size['width'] <= viewport_width
+        )
+
+        return is_in_viewport
+
     def select_date(self, target_date_input):
         target_id = f"nav_date_{target_date_input}"
 
-        #Scroll if needed (optional - to ensure it's visible)
-        target_element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, target_id)))
-        self.driver.execute_script("arguments[0].scrollIntoView(true);", target_element)
-        target_element.click()
+        try:
+            # Wait until the target date element is present in the DOM
+            target_element = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, target_id))
+            )
+            # Scroll the element into view (multiple attempts if needed)
+            for _ in range(5):  # Try 5 scrolls
+                self.driver.execute_script("arguments[0].scrollIntoView(true);", target_element)
+                time.sleep(0.5)  # Add a small delay for the page to catch up
+                if self.is_element_in_viewport(target_element):  # Check if it's now in the viewport
+                    break
+            # After scrolling, click on the target element
+            target_element.click()
+            print(f"🎯 Date {target_date_input} selected successfully.")
+        except Exception as e:
+            print(f"Error selecting date: {e}")
 
     def select_schedule(self, time_input):
         time_input = time_input.strip()
