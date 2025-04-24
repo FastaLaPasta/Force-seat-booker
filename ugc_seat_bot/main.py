@@ -108,6 +108,14 @@ class UGCBookingBot:
                 return
         raise ValueError(f"Error selecting movie: '{movie_title}' ")
 
+    def select_date(self, target_date_input):
+        target_id = f"nav_date_{target_date_input}"
+
+        #Scroll if needed (optional - to ensure it's visible)
+        target_element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, target_id)))
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", target_element)
+        target_element.click()
+
     def select_schedule(self, time_input):
         time_input = time_input.strip()
         buttons = self.driver.find_elements(By.CSS_SELECTOR, "li.position-relative button")
@@ -132,6 +140,7 @@ class UGCBookingBot:
             self.click_button(By.CSS_SELECTOR, "button.pseudo-select[data-target='#modal-search-cinema']")
             self.select_city(city_input)
             self.select_cinema(cinema_input)
+            self.select_date(target_date_input=input('Enter the date you want to book a seat(yyyy-mm-dd): '))
             self.select_movie(movie_title=input('enter the movie u wanna watch: '))
             self.select_schedule(time_input=input('Time (HH:MM): '))
         except Exception as e:
