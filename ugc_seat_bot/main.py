@@ -41,7 +41,7 @@ class UGCBookingBot:
             if response.status_code == 204:
                 print('Discord Notification send!')
             else:
-                print("Failed to send Discord message:", response.txt)
+                print("Failed to send Discord message:", response.text)
         except Exception as e:
             print(f"Discord webhook error: {e}")
 
@@ -98,6 +98,30 @@ class UGCBookingBot:
                     return
         raise ValueError(f"Cinema '{cinema_input}' not found.")
 
+    def select_movie(self, movie_title):
+        movie_title = movie_title.strip().lower()
+        movie_links = self.driver.find_elements(By.CSS_SELECTOR, "a[id^='goToFilm_'][id$='_info_title']")
+        for link in movie_links:
+            if movie_title in link.text.strip().lower():
+                print(f'movie "{link.text.strip()}" has been finded')
+                link.click()
+                return
+        raise ValueError(f"Error selecting movie: '{movie_title}' ")
+
+    def select_schedule(self, time_input):
+        time_input = time_input.strip()
+        buttons = self.driver.find_elements(By.CSS_SELECTOR, "li.position-relative button")
+        for btn in buttons:
+            try:
+                start_time = btn.find_element(By.CSS_SELECTOR, "div.screening-start").text.strip()
+                if start_time == time_input:
+                    print(f"Clicked on showtime: {start_time}")
+                    btn.click()
+                    return
+            except Exception:
+                continue
+        raise ValueError(f"No schedule found for time {time_input}")
+
     def navigate_to_movie(self, city_input: str, cinema_input: str):
         """
         Navigates to the desired cinema based on user input.
@@ -108,6 +132,8 @@ class UGCBookingBot:
             self.click_button(By.CSS_SELECTOR, "button.pseudo-select[data-target='#modal-search-cinema']")
             self.select_city(city_input)
             self.select_cinema(cinema_input)
+            self.select_movie(movie_title=input('enter the movie u wanna watch: '))
+            self.select_schedule(time_input=input('Time (HH:MM): '))
         except Exception as e:
             print(f"Navigation error: {e}")
             self.driver.quit()
@@ -149,7 +175,7 @@ class UGCBookingBot:
         available_seats = []
         for seat in seats:
             if 'siege_occupe' not in seat.get_attribute("class") and 'pmr' not in seat.get_attribute("outerHTML"):
-                available_seats.append(seat.get_attribute('id'))
+                available_seats.append(seat.get_attribute('id').replace('siege_', ""))
         return available_seats
 
     def quit_driver(self):
@@ -184,9 +210,7 @@ class UGCBookingBot:
 
         self.navigate_to_movie(city, cinema)
 
-        # TODO THe movie and schedule selection to do
-        self.click_button(By.ID, 'goToFilm_5828_info_title')
-        self.click_button(By.ID, 'goToShowing_330471481717')
+        # TODO need something to select a specific date
 
         # TODO will come later after user's accounts have been implemented
         self.login()
