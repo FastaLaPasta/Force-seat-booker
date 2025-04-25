@@ -22,6 +22,8 @@ A bot with one mission: _bring balance to the seat reservations._
 - 🍿 Lets you choose your city, cinema, and movie
 - 🤖 Selects the desired date even if it's off-screen (with scroll magic)
 - 🧪 Debugging tools and logs for testing the seat-checking logic
+- 🪑 Detecting available seats dynamically
+- ⏳ Scheduling automatic checks every X minutes
 
 You can already see it visiting the site like a regular moviegoer... except it doesn’t eat popcorn.
 
@@ -31,19 +33,16 @@ You can already see it visiting the site like a regular moviegoer... except it d
 
 The bot is still training in the ways of the Force. Here's what's being actively worked on:
 
-- 🪑 Detecting available seats dynamically
-- 📬 Notifying the user (via email, Telegram, etc.) when a seat becomes available
+- 📬 Notifying the user (via email, Telegram, etc.) when a seat becomes available (actually send available seat on a discord server)
 - 🕵️‍♂️ Smarter detection of movie times and filtering for desired hours
-- ⏳ Scheduling automatic checks every X minutes
 
 ---
 
 ## 🔮 Coming Soon
 
 - 🎟 Auto-booking functionality (only if ethically justifiable 😉)
-- 🧠 Smarter AI that learns your preferences
 - 🧘‍♂️ UI/UX Zen mode for non-tech users
-- 🛰 Deployable on a Raspberry Pi to run 24/7 like a true Sith Lord
+- 🛰 Make it a web app
 
 ---
 
